@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LODES Explorer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>LODES Explorer</h1>
+            <p>Workplace Area Characteristics by Block Group</p>
+        </header>
+
+        <div class="controls-panel">
+            <div class="control-section">
+                <label for="cbsa-select">
+                    <strong>Core Based Statistical Area (CBSA):</strong>
+                </label>
+                <select id="cbsa-select">
+                    <option value="">Select a CBSA...</option>
+                </select>
+            </div>
+
+            <div class="filters-section" id="filters-section" style="display: none;">
+                <h3>Employment Filters</h3>
+                
+                <div class="filter-group">
+                    <label><strong>Employment Sector:</strong></label>
+                    <select id="employment-code">
+                        <option value="">All Sectors</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label><strong>Worker Age:</strong></label>
+                    <select id="age-group">
+                        <option value="">All Ages</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label><strong>Earnings Bracket:</strong></label>
+                    <select id="earnings-bracket">
+                        <option value="">All Earnings</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label><strong>Education Level:</strong></label>
+                    <select id="education-level">
+                        <option value="">All Education Levels</option>
+                    </select>
+                </div>
+
+                <button id="apply-filters">Apply Filters</button>
+                <button id="clear-filters">Clear</button>
+            </div>
+
+            <div class="stats-section" id="stats-section" style="display: none;">
+                <h3>CBSA Statistics</h3>
+                <p>Total Jobs: <span id="total-jobs">-</span></p>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+            <div id="legend">
+                <h4>Jobs Count</h4>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffffcc;"></div>
+                    <span>0-100</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #c7e9b4;"></div>
+                    <span>100-500</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #7fbc41;"></div>
+                    <span>500-1,000</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #2b8a0b;"></div>
+                    <span>1,000+</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
