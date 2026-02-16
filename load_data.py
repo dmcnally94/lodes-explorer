@@ -15,8 +15,8 @@ DB_FILE = "lodes.db"
 
 CBSA_MAPPING = {
     "31080": "Los Angeles-Long Beach-Anaheim, CA",
-    "41860": "Portland-Vancouver-Hillsboro, OR-WA",
-    "47900": "Seattle-Tacoma-Bellevue, WA",
+    "41860": "San Francisco-Oakland-Fremont, CA",
+    "47900": "Washington-Arlington-Alexandria, DC-VA-MD-WV",
 }
 
 def init_database():
@@ -89,6 +89,11 @@ def init_cbsas():
         cursor.execute(
             "INSERT OR IGNORE INTO cbsas (cbsa_code, cbsa_name) VALUES (?, ?)",
             (code, name)
+        )
+        # Ensure name is up-to-date even if record already existed
+        cursor.execute(
+            "UPDATE cbsas SET cbsa_name = ? WHERE cbsa_code = ?",
+            (name, code)
         )
     
     conn.commit()

@@ -50,16 +50,23 @@ async function selectCBSA(cbsaCode) {
     document.getElementById('stats-section').style.display = 'block';
 
     // Fetch and display block groups
-    const geojsonData = await fetchBlockGroups(cbsaCode);
-    if (geojsonData) {
-        loadBlockGroupsOnMap(geojsonData);
-        
+    try {
+        if (typeof showMapLoading === 'function') showMapLoading();
+        const geojsonData = await fetchBlockGroups(cbsaCode);
+        if (geojsonData) {
+            loadBlockGroupsOnMap(geojsonData);
+        }
+
         // Update statistics
         const cbsaDetails = await fetchCBSADetails(cbsaCode);
         if (cbsaDetails) {
             document.getElementById('total-jobs').textContent = 
                 cbsaDetails.total_jobs.toLocaleString();
         }
+    } catch (err) {
+        console.error('Error loading CBSA block groups', err);
+    } finally {
+        if (typeof hideMapLoading === 'function') hideMapLoading();
     }
 }
 
@@ -114,9 +121,16 @@ async function applyFilters() {
         education_level: document.getElementById('education-level').value || null,
     };
 
-    const geojsonData = await fetchFilteredBlockGroups(currentCBSA, filters);
-    if (geojsonData) {
-        loadBlockGroupsOnMap(geojsonData);
+    try {
+        if (typeof showMapLoading === 'function') showMapLoading();
+        const geojsonData = await fetchFilteredBlockGroups(currentCBSA, filters);
+        if (geojsonData) {
+            loadBlockGroupsOnMap(geojsonData);
+        }
+    } catch (err) {
+        console.error('Error applying filters', err);
+    } finally {
+        if (typeof hideMapLoading === 'function') hideMapLoading();
     }
 }
 

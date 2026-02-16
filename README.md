@@ -47,8 +47,8 @@ A modern web application for exploring LODES workplace area characteristics data
 | Code | City | Block Groups | Jobs |
 |------|------|--------------|------|
 | 31080 | Los Angeles-Long Beach-Anaheim, CA | 8,714 | 6,588,635 |
-| 41860 | Portland-Vancouver-Hillsboro, OR-WA | - | 2,497,939 |
-| 47900 | Seattle-Tacoma-Bellevue, WA | 4,096 | 3,140,158 |
+| 41860 | San Francisco-Oakland-Fremont, CA | - | 2,497,939 |
+| 47900 | Washington-Arlington-Alexandria, DC-VA-MD-WV | 4,096 | 3,140,158 |
 
 *Note: 41860 data is loaded but geometries not provided in CSV files*
 

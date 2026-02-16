@@ -79,6 +79,112 @@ def get_cbsa(cbsa_code: str):
     return dict(row)
 
 
+@router.post("/blockgroups/filtered")
+@router.get("/blockgroups/filtered")
+def get_filtered_blockgroups(
+    cbsa_code: str,
+    employment_code: Optional[str] = None,
+    age_group: Optional[str] = None,
+    earnings_bracket: Optional[str] = None,
+    education_level: Optional[str] = None,
+):
+    """
+    Get block groups filtered by employment characteristics.
+    Returns GeoJSON FeatureCollection with filtered data.
+    """
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    # Build query
+    query = """
+        SELECT bg.bg_geoid, bg.geometry, w.*
+        FROM blockgroups bg
+        JOIN wac_data w ON bg.bg_geoid = w.bg_geoid AND bg.cbsa_code = w.cbsa_code
+        WHERE bg.cbsa_code = ?
+    """
+    params = [cbsa_code]
+    
+    # Add employment code filter
+    if employment_code:
+        col_name = employment_code.lower()
+        query += f" AND w.{col_name} > 0"
+    
+    # Add age group filter
+    if age_group:
+        col_name = age_group.lower()
+        query += f" AND w.{col_name} > 0"
+    
+    # Add earnings bracket filter
+    if earnings_bracket:
+        col_name = earnings_bracket.lower()
+        query += f" AND w.{col_name} > 0"
+    
+    # Add education level filter
+    if education_level:
+        col_name = education_level.lower()
+        query += f" AND w.{col_name} > 0"
+    
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+    conn.close()
+
+    features = []
+    for row in rows:
+        try:
+            geometry = parse_polygon_wkt(row["geometry"])
+            if not geometry:
+                continue
+
+            # Compute metric_value as the combination of all selected filters.
+            # Since the WAC data provides marginal counts (no cross-tab),
+            # we conservatively approximate the intersection by taking the minimum
+            # of the selected filter columns for this block group.
+            selected_cols = []
+            if employment_code:
+                selected_cols.append(employment_code.lower())
+            if age_group:
+                selected_cols.append(age_group.lower())
+            if earnings_bracket:
+                selected_cols.append(earnings_bracket.lower())
+            if education_level:
+                selected_cols.append(education_level.lower())
+
+            metric_value = row["c000"] or 0
+            if selected_cols:
+                vals = []
+                keys = set(row.keys())
+                for col in selected_cols:
+                    try:
+                        vals.append(row[col] if col in keys and row[col] is not None else 0)
+                    except Exception:
+                        vals.append(0)
+                metric_value = int(min(vals)) if vals else 0
+
+            properties = {
+                "bg_geoid": row["bg_geoid"],
+                "metric_value": metric_value or 0,
+                "total_jobs": row["c000"] or 0,
+                "filter_employment_code": employment_code or None,
+                "active_filters": selected_cols,
+            }
+
+            feature = {
+                "type": "Feature",
+                "properties": properties,
+                "geometry": geometry
+            }
+            features.append(feature)
+        except Exception as e:
+            print(f"Error processing row: {e}")
+            continue
+
+    return {
+        "type": "FeatureCollection",
+        "features": features
+    }
+
+
+
 @router.get("/blockgroups/{cbsa_code}")
 def get_blockgroups(cbsa_code: str):
     """
@@ -101,7 +207,12 @@ def get_blockgroups(cbsa_code: str):
     conn.close()
     
     if not rows:
-        raise HTTPException(status_code=404, detail="CBSA or block groups not found")
+        # Return an empty FeatureCollection when a CBSA exists but has no block groups
+        # (avoid returning 404 which makes the frontend harder to handle)
+        return {
+            "type": "FeatureCollection",
+            "features": []
+        }
     
     features = []
     for row in rows:
@@ -164,87 +275,6 @@ def get_filter_options():
         ]
     )
 
-
-@router.post("/blockgroups/filtered")
-def get_filtered_blockgroups(
-    cbsa_code: str,
-    employment_code: Optional[str] = None,
-    age_group: Optional[str] = None,
-    earnings_bracket: Optional[str] = None,
-    education_level: Optional[str] = None,
-):
-    """
-    Get block groups filtered by employment characteristics.
-    Returns GeoJSON FeatureCollection with filtered data.
-    """
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    # Build query
-    query = """
-        SELECT bg.bg_geoid, bg.geometry, w.*
-        FROM blockgroups bg
-        JOIN wac_data w ON bg.bg_geoid = w.bg_geoid AND bg.cbsa_code = w.cbsa_code
-        WHERE bg.cbsa_code = ?
-    """
-    params = [cbsa_code]
-    
-    # Add employment code filter
-    if employment_code:
-        col_name = employment_code.lower()
-        query += f" AND w.{col_name} > 0"
-    
-    # Add age group filter
-    if age_group:
-        col_name = age_group.lower()
-        query += f" AND w.{col_name} > 0"
-    
-    # Add earnings bracket filter
-    if earnings_bracket:
-        col_name = earnings_bracket.lower()
-        query += f" AND w.{col_name} > 0"
-    
-    # Add education level filter
-    if education_level:
-        col_name = education_level.lower()
-        query += f" AND w.{col_name} > 0"
-    
-    cursor.execute(query, params)
-    rows = cursor.fetchall()
-    conn.close()
-    
-    features = []
-    for row in rows:
-        try:
-            geometry = parse_polygon_wkt(row["geometry"])
-            if not geometry:
-                continue
-            
-            # Determine metric value based on filter
-            metric_value = row["c000"]
-            if employment_code:
-                metric_value = getattr(row, employment_code.lower(), 0)
-            
-            properties = {
-                "bg_geoid": row["bg_geoid"],
-                "metric_value": metric_value or 0,
-                "total_jobs": row["c000"] or 0,
-            }
-            
-            feature = {
-                "type": "Feature",
-                "properties": properties,
-                "geometry": geometry
-            }
-            features.append(feature)
-        except Exception as e:
-            print(f"Error processing row: {e}")
-            continue
-    
-    return {
-        "type": "FeatureCollection",
-        "features": features
-    }
 
 
 def parse_polygon_wkt(wkt_string: str) -> dict:

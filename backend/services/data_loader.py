@@ -9,8 +9,8 @@ from ..database.models import CBSA, BlockGroup, WACData
 
 CBSA_MAPPING = {
     "31080": "Los Angeles-Long Beach-Anaheim, CA",
-    "41860": "Portland-Vancouver-Hillsboro, OR-WA",
-    "47900": "Seattle-Tacoma-Bellevue, WA",
+    "41860": "San Francisco-Oakland-Fremont, CA",
+    "47900": "Washington-Arlington-Alexandria, DC-VA-MD-WV",
 }
 
 NAICS_DESCRIPTIONS = {
@@ -155,7 +155,13 @@ def initialize_cbsas(db: Session):
             db.commit()
             print(f"Created CBSA {code}: {name}")
         else:
-            print(f"CBSA {code} already exists")
+            # Update name if it differs from mapping
+            if existing.cbsa_name != name:
+                existing.cbsa_name = name
+                db.commit()
+                print(f"Updated CBSA {code} name to: {name}")
+            else:
+                print(f"CBSA {code} already exists")
 
 
 def load_all_data(db: Session, data_dir: str = "."):

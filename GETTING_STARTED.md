@@ -69,8 +69,8 @@ Uvicorn running on http://0.0.0.0:8000
 ### 1. Select a CBSA
 Click the dropdown and choose from:
 - **31080** - Los Angeles-Long Beach-Anaheim, CA (6.5M jobs)
-- **41860** - Portland-Vancouver-Hillsboro, OR-WA (2.5M jobs)
-- **47900** - Seattle-Tacoma-Bellevue, WA (3.1M jobs)
+- **41860** - San Francisco-Oakland-Fremont, CA (2.5M jobs)
+- **47900** - Washington-Arlington-Alexandria, DC-VA-MD-WV (3.1M jobs)
 
 ### 2. View Block Groups
 Map shows all block groups as colored regions:
@@ -157,7 +157,7 @@ python -m uvicorn backend.app:app --port 8001
 **Solution**: 
 1. Confirm `lodes.db` is in the same directory as `load_data.py`
 2. For filtering, multiple filters are AND-ed (more restrictive)
-3. Seattle (47900) is smaller - try that first
+3. Washington DC (47900) is smaller - try that first
 
 ## Development Commands
 

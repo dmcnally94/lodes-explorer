@@ -15,7 +15,8 @@
             <p>Workplace Area Characteristics by Block Group</p>
         </header>
 
-        <div class="controls-panel">
+        <div class="main-content">
+            <div class="controls-panel">
             <div class="control-section">
                 <label for="cbsa-select">
                     <strong>Core Based Statistical Area (CBSA):</strong>
@@ -64,10 +65,14 @@
                 <h3>CBSA Statistics</h3>
                 <p>Total Jobs: <span id="total-jobs">-</span></p>
             </div>
-        </div>
+            </div>
 
-        <div class="map-container">
+            <div class="map-container">
             <div id="map"></div>
+            <div id="map-loader" class="map-loader" aria-hidden="true">
+                <div class="spinner"></div>
+                <div class="loader-text">Loading map...</div>
+            </div>
             <div id="legend">
                 <h4>Jobs Count</h4>
                 <div class="legend-item">
@@ -86,6 +91,7 @@
                     <div class="legend-color" style="background-color: #2b8a0b;"></div>
                     <span>1,000+</span>
                 </div>
+            </div>
             </div>
         </div>
     </div>

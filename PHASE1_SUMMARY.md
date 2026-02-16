@@ -46,7 +46,7 @@ GET    /health                                 # Health check
 
 | Metric | Value |
 |--------|-------|
-| CBSAs | 3 (Los Angeles, Portland, Seattle) |
+| CBSAs | 3 (Los Angeles, San Francisco, Washington DC) |
 | Block Groups | 15,785 |
 | Employment Records | 15,785 |
 | Total Jobs | 12.2 Million |
@@ -135,10 +135,10 @@ lodes-explorer/
 │
 ├── 31080_all2023.csv                  # LA employment data
 ├── 31080_blockgroups2023.csv          # LA geometries
-├── 41860_all2023.csv                  # Portland employment
+├── 41860_all2023.csv                  # San Francisco-Oakland-Fremont employment
 ├── 41860_blockgroups2023.csv          # (not provided)
-├── 47900_all2023.csv                  # Seattle employment
-├── 47900_blockgroups2023.csv          # Seattle geometries
+├── 47900_all2023.csv                  # Washington-Arlington-Alexandria employment
+├── 47900_blockgroups2023.csv          # Washington-Arlington-Alexandria geometries
 ├── wac_file_structure_combined.csv    # Data dictionary
 │
 └── .gitignore                         # Git configuration
@@ -172,7 +172,7 @@ lodes-explorer/
 
 ## Known Limitations
 
-⚠️ **Portland (41860)** geometries not provided in data files  
+⚠️ **San Francisco-Oakland-Fremont (41860)** geometries not provided in data files  
 ⚠️ **Browser compatibility**: Modern browsers required (ES6+)  
 ⚠️ **Large datasets**: Performance degrades significantly >20,000 features  
 ⚠️ **Mobile**: Map controls optimized for desktop  
