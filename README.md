@@ -174,6 +174,60 @@ Remove-Item lodes.db
 python load_data.py .
 ```
 
+## Deployment (Render.com)
+
+The app is designed to run as a single FastAPI service that
+serves both the backend API and the static frontend from the root
+path.  A simple `render.yaml` configuration is included at the
+repository root so the project can be connected to Render's GitHub
+integration.
+
+1. **Prepare your repo**
+   * Commit the `lodes.db` file if you want a pre‑populated database.
+     Otherwise the build step will regenerate the database from the
+     CSVs bundled in the repository.
+   * Ensure CSV files (`*_blockgroups2023.csv` and `*_all2023.csv`)
+     are present in the repo root so `load_data.py` can find them.
+   * Push the branch to GitHub and make sure Render has access.
+
+2. **Create a Render web service**
+   * Log in at https://render.com and click **New** → **Web Service**.
+   * Connect your GitHub account and select the `lodes-explorer` repo.
+   * Choose the `main` branch (or whichever branch you pushed).
+   * For **Environment**, pick **Python 3**.  (The free tier works fine.)
+   * Set the **Build Command** and **Start Command** manually if not
+     using `render.yaml`:
+     ```bash
+     pip install -r backend/requirements.txt
+     python load_data.py .           # populates lodes.db during build
+     ```
+     ```bash
+     uvicorn backend.app:app --host 0.0.0.0 --port $PORT
+     ```
+   * If you are using the `render.yaml`, Render will auto‑detect the
+     settings and you can skip manual entries.
+   * Optionally add an env var `PYTHONUNBUFFERED=1` for better logging.
+
+3. **Verify deployment**
+   * Once the build succeeds you will be given a URL (e.g.
+     `https://lodes-explorer.onrender.com`).
+   * Visit `/api/` to see the API index, and the root path for the
+     static frontend.
+   * Exercises such as `curl https://<your-url>/api/cbsas` should work.
+
+4. **Updating the service**
+   * Push new commits to the tracked branch; Render will automatically
+     rebuild and redeploy.
+   * If you add or change CSVs, the build step will reload the database
+     on each deploy.  Alternatively, manually rebuild from the Render
+     dashboard.
+
+> **Note:** Render’s filesystem is ephemeral. Any runtime changes to
+> `lodes.db` (e.g., filters or other mutations) will be lost when the
+> instance restarts.  Use the build step or a persistent data store if
+> you need to retain state.
+
+
 ### Geometry not rendering
 - Check browser console for errors
 - Verify WKT parsing in `map.js`

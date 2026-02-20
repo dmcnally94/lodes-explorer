@@ -1,0 +1,20 @@
+# Render configuration for LODES Explorer web service
+# https://render.com/docs/render-yaml
+
+services:
+  - type: web
+    name: lodes-explorer
+    env: python
+    # region: oregon          # optional, choose closest to your users
+    plan: free
+    # Build step: install deps and populate the SQLite database
+    buildCommand: |
+      pip install -r backend/requirements.txt
+      # CSV files are in the repo root; loading will create lodes.db
+      python load_data.py .
+    # Start the FastAPI/uvicorn application. Render exposes a
+    # port in the $PORT environment variable which must be used.
+    startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: 1
